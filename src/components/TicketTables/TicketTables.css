@@ -1,0 +1,42 @@
+/* .add_button {
+  margin-right: 1182px;
+  margin-top: 25px;
+  background: #ffc107;
+  color: black;
+  width: 7%;
+}
+
+.add_button:hover {
+  margin-right: 1182px;
+  margin-top: 25px;
+  background: #ffc107;
+  color: black;
+  width: 7%;
+} */
+
+
+.trash {
+  display: flex;
+  justify-content: space-between;
+}
+
+.trash svg {
+  height: 16px;
+  width: 16px;
+  cursor: pointer;   
+}
+
+
+
+
+@media (max-width: 500px) {
+  .search_bar {
+    width: 65% !important;
+  }
+}
+
+@media (max-width: 770px) {
+  .search_bar {
+    width: 46% !important;
+  }
+}

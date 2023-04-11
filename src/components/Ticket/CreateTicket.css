@@ -1,0 +1,60 @@
+.create-ticket-form {
+    /* border: 2px solid red; */
+    margin-top: 70px;
+    /* width: 30%; */
+    width: 440px;
+    padding: 50px 40px;
+    box-shadow: 0 0.188em 1.55em rgb(156, 156, 156);
+    border-radius: 20px;
+    /* height: 400px; */
+    height: 50%;
+}
+
+.custom-btn {
+    width: 100% !important;
+    margin-top: 20px;
+}
+
+/* 
+@media (max-width: 1200px) {
+    .create-ticket-form {
+        width: 40%;
+    }
+}
+
+@media (max-width: 1000px) {
+    .create-ticket-form {
+        width: 45%;
+    }
+}
+
+@media (max-width: 800px) {
+    .create-ticket-form {
+        width: 50%;
+    }
+}
+
+@media (max-width: 700px) {
+    .create-ticket-form {
+        width: 55%;
+    }
+}
+
+@media (max-width: 600px) {
+    .create-ticket-form {
+        width: 60%;
+    }
+}
+
+@media (max-width: 500px) {
+    .create-ticket-form {
+        width: 80%;
+    }
+} */
+
+
+@media (max-width: 500px) {
+    .create-ticket-form {
+        width: 350px;
+    }
+}

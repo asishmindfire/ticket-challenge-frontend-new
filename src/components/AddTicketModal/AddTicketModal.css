@@ -1,0 +1,39 @@
+.add_button {
+  /* margin-right: 1182px; */
+  margin-top: 25px;
+  background: #ffc107;
+  color: black;
+  width: 7%;
+  padding: 7px;
+  border-radius: 10px;
+}
+
+.add_button:hover {
+  margin-right: 1182px;
+  margin-top: 25px;
+  background: #ffc107;
+  color: black;
+  width: 7%;
+}
+
+@media (max-width: 500px) {
+  .add_button {
+    width: 20%;
+    padding: 5px;
+  }
+
+  .add_button:hover {
+    width: 20%;
+  }
+}
+
+@media (max-width: 1000px) {
+  .add_button {
+    width: 15%;
+    padding: 5px;
+  }
+  .add_button:hover {
+    width: 15%;
+    padding: 5px;
+  }
+}

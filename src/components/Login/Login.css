@@ -1,0 +1,153 @@
+* {
+  margin: 0;
+  box-sizing: border-box;
+  /* font-family: "Michroma", sans-serif; */
+}
+
+.page {
+  /* height: 90vh; */
+  height: 600px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.designer-font {
+  font-family: "Michroma", sans-serif;
+}
+
+.cover {
+  background-color: white;
+  width: 26em;
+  height: 28em;
+  position: relative;
+  border-radius: 1em;
+  box-shadow: 0 0.188em 1.55em rgb(156, 156, 156);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* justify-content: space-around; */
+  justify-content: center;
+}
+
+.cover h1 {
+  margin-top: -75px;
+}
+
+.alt-login {
+  width: 80%;
+  height: 3em;
+  display: flex;
+  justify-content: space-around;
+}
+
+.alt-login div {
+  width: 40%;
+  height: 90%;
+  border-radius: 0.25em;
+  background-color: black;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+/* .facebook {
+    background-image: url("../../images/facebook.png");
+  }
+  
+  .google {
+    background-image: url("../../images/google.png");
+  } */
+
+input {
+  margin-top: 40px;
+  border: none;
+  background-color: rgb(229, 226, 226);
+  height: 1.5em;
+  width: 80%;
+  border-radius: 0.25em;
+  text-align: center;
+  padding: 1.5em;
+}
+
+input:focus {
+  outline-color: rgb(32, 177, 255);
+}
+
+/* .login-btn {
+      width: 40%;
+      height: 3em;
+      background-color: rgb(32, 177, 255);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: 0.5s;
+      border-radius: 0.25em;
+      cursor: pointer;
+  } */
+
+.signin-signup-btn {
+  /* border: 1px solid red; */
+  width: 80%;
+  height: 3em;
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+.signin-signup-btn div {
+  margin-top: 38px;
+  width: 100%;
+  height: 3em;
+  background-color: rgb(32, 177, 255);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.5s;
+  border-radius: 0.25em;
+  cursor: pointer;
+}
+
+.signin-signup-btn div:hover {
+  transform: scale(1.1);
+}
+
+/* .login-btn:hover {
+      transform: scale(1.12);
+  } */
+
+.text {
+  position: relative;
+  bottom: -2em;
+}
+
+/* .hide {
+      position: absolute;
+      top: 400px;
+      transform: scale(0);
+  } */
+
+/* .login-popup {
+      position: absolute;
+      height: 30em;
+      width: 30em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0.25em;
+      background-color: black;
+      color: white;
+      bottom: 0;
+      transform: scale(1);
+      transition: 1s;
+  } */
+
+@media (max-width: 500px) {
+  .cover {
+    width: 23em;
+    margin: 0px 30px;
+  }
+}
