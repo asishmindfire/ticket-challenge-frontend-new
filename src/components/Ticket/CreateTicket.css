@@ -1,18 +1,35 @@
 .create-ticket-form {
-    /* border: 2px solid red; */
-    margin-top: 70px;
-    /* width: 30%; */
-    width: 440px;
-    padding: 50px 40px;
-    box-shadow: 0 0.188em 1.55em rgb(156, 156, 156);
-    border-radius: 20px;
-    /* height: 400px; */
-    height: 50%;
+  /* border: 2px solid red; */
+  margin-top: 24px;
+  /* width: 30%; */
+  width: 440px;
+  padding: 50px 40px;
+  box-shadow: 0 0.188em 1.55em rgb(156, 156, 156);
+  border-radius: 20px;
+  /* height: 400px; */
+  height: 50%;
 }
 
 .custom-btn {
-    width: 100% !important;
-    margin-top: 20px;
+  border-radius: 5px;
+  padding: 10px;
+  width: 100% !important;
+  margin-top: 20px;
+  background-color: rgb(32, 177, 255);
+  border: none;
+  color: black;
+  transition: all .5s;
+}
+
+.custom-btn:hover {
+    transform: scale(1.1);
+}
+
+.create-ticket-header {
+  font-size: 30px;
+  text-align: center;
+  margin-top: -20px;
+  margin-bottom: 25px;
 }
 
 /* 
@@ -52,9 +69,8 @@
     }
 } */
 
-
 @media (max-width: 500px) {
-    .create-ticket-form {
-        width: 350px;
-    }
+  .create-ticket-form {
+    width: 350px;
+  }
 }

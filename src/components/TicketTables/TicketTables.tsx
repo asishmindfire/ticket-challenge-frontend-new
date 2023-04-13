@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import DataTable from "react-data-table-component";
 import "./TicketTables.css";
 import moment from "moment-timezone";
@@ -7,15 +7,22 @@ import AddTicketModal from "../AddTicketModal/AddTicketModal";
 import Services from "../../service/http";
 import { Trash } from "react-feather";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import Error from "../Error/Error";
+// import Error from "../Error/Error";
+import AlertDialog from "../ConfirmationAlert/ConfirmationAlert";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const TicketTables = () => {
   const user: any = localStorage.getItem("user");
   const logedInUser = JSON.parse(user);
   const userName = logedInUser.user.user_name;
   const [search, setSearch] = useState("");
-  const [countries, setCountries] = useState<any>([]);
+  // const search = useRef<any>("");
+
+  // const [countries, setCountries] = useState<any>([]);
+  const [tickets, setTickets] = useState<any>([]);
   const [filteredTickets, setFilteredTickets] = useState([]);
+
   const [rowDetails, setRowDetails] = useState<any>({});
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState<any>([]);
@@ -23,32 +30,42 @@ const TicketTables = () => {
   const [commentId, setCommentId] = useState(0);
   const [isEditMode, setIsEditMode] = useState(false);
   const [ticketId, setTicketId] = useState("");
-  const [error, setError] = useState(false);
-  const [errMsg, setErrMsg] = useState("");
+  // const [error, setError] = useState(false);
+  // const [errMsg, setErrMsg] = useState("");
   const [check, setCheck] = useState(true);
   const [users, setUsers] = useState([]);
   const [ticketAssignedUser, setTicketAssignedUser] = useState<any>({});
+  const [togglePopup, setTogglePopup] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+  const [totalRows, setTotalRows] = useState(0);
+  const [perPage, setPerPage] = useState(10);
+  const [pageCount, setPageCount] = useState(1);
 
   const deleteCommet = async (cid: any) => {
     try {
-      const deletedComment = await Services.deleteRequestUsingTwoParamIds(
+      // const deletedComment = await Services.deleteRequestUsingTwoParamIds(
+      //   "/comment",
+      //   rowDetails._id,
+      //   cid
+      // );
+
+      const deletedComment = await Services.deleteRequestUsingTwoParamId(
         "/comment",
         rowDetails._id,
         cid
       );
       if (!deletedComment?.data.status) {
-        setError(true);
-        setErrMsg(
-          "Service Unavailable."
-        );
+        // setError(true);
+        // setErrMsg("Service Unavailable.");
+        toast.error(deletedComment.data.message);
         return;
       }
       setBol(1);
     } catch (error) {
-      setError(true);
-      setErrMsg(
-        "Service Unavailable."
-      );
+      // setError(true);
+      // setErrMsg("Service Unavailable.");
+      toast.error("Service Unavailable, Please try after sometime.");
     }
   };
 
@@ -59,33 +76,38 @@ const TicketTables = () => {
   const handleEnter = async (e: any, id: any, username: any, comment: any) => {
     try {
       if (e.key === "Enter") {
-        var obj = {
-          update_data: {
-            id: id,
-            comment: comment,
-            username: username,
-          },
-        };
+        // var obj = {
+        //   update_data: {
+        //     id: id,
+        //     comment: comment,
+        //     username: username,
+        //   },
+        // };
+        // const updatedComment = await Services.putRequestUsingParamIdAndBody(
+        //   "/comment",
+        //   obj,
+        //   rowDetails._id
+        // );
+
         const updatedComment = await Services.putRequestUsingParamIdAndBody(
           "/comment",
-          obj,
+          {
+            id: id,
+            comment: comment,
+          },
           rowDetails._id
         );
         if (!updatedComment?.data.status) {
-          setError(true);
-          setErrMsg(
-            "Service Unavailable."
-          );
+          toast.error(updatedComment.data.message);
           return;
         }
         setBol(1);
         setIsEditMode(false);
       }
     } catch (error) {
-      setError(true);
-      setErrMsg(
-        "Service Unavailable."
-      );
+      // setError(true);
+      // setErrMsg("Service Unavailable.");
+      toast.error("Service Unavailable, Please try after sometime.");
     }
   };
 
@@ -99,70 +121,87 @@ const TicketTables = () => {
         data.assign_to
       );
       if (!AssignedUser?.data.status) {
-        setError(true);
-        setErrMsg(
-          "Service Unavailable."
-        );
+        toast.error(AssignedUser.data.message);
         return;
       }
       setTicketAssignedUser(AssignedUser.data.data);
     } catch (error) {
-      setError(true);
-      setErrMsg(
-        "Service Unavailable."
-      );
+      toast.error("User service unavailable, Please try after sometime.");
     }
   };
 
-  const getTickets = async () => {
-    try {
-      const tickets = await Services.getRequest("/ticket");
-      if (!tickets?.data.status) {
-        setError(true);
-        setErrMsg(
-          "Service Unavailable."
-        );
-        return;
-      }
-      setCountries(tickets.data.data);
-      setFilteredTickets(tickets.data.data);
-    } catch (error) {
-      setError(true);
-      setErrMsg(
-        "Service Unavailable."
-      );
-    }
+  const handlePageChange = (page: any) => {
+    // console.log({ page });
+    setPageCount(page);
+    getTickets(page);
   };
+
+  const handlePerRowsChange = async (newPerPage: any, page: any) => {
+    // console.log({newPerPage, page});
+    setLoading(true);
+
+    const tickets = await Services.getPaginatedTickets(page, perPage);
+
+    setTickets(tickets.data.data.result);
+    setPerPage(newPerPage);
+    setLoading(false);
+  };
+
+  const getTickets = useCallback(
+    async (page: any) => {
+      try {
+        const tickets = await Services.getPaginatedTickets(page, perPage);
+        if (!tickets?.data.status) {
+          // setError(true);
+          // setErrMsg("Service Unavailable.");
+          toast.error(tickets.data.message);
+          return;
+        }
+        setTickets(tickets.data.data.result);
+        setFilteredTickets(tickets.data.data.result);
+        setTotalRows(tickets.data.data.totalTickets);
+      } catch (error) {
+        // setError(true);
+        // setErrMsg("Service Unavailable.");
+        toast.error("Ticket service unavailable, Please try after sometime.");
+      }
+    },
+    [perPage]
+  );
 
   useEffect(() => {
-    getTickets();
-  }, []);
+    getTickets(1);
+  }, [getTickets]);
 
   const handleOnClick = async () => {
     try {
+      // const updateComment = await Services.postRequest("/comment", {
+      //   ticketId: rowDetails._id,
+      //   comments: [
+      //     {
+      //       username: userName,
+      //       comment: commentText,
+      //     },
+      //   ],
+      // });
+
       const updateComment = await Services.postRequest("/comment", {
         ticketId: rowDetails._id,
-        comments: [
-          {
-            username: userName,
-            comment: commentText,
-          },
-        ],
+        username: userName,
+        comment: commentText,
       });
       if (!updateComment?.data.status) {
-        setError(true);
-        setErrMsg(
-          "Service Unavailable."
-        );
+        // setError(true);
+        // setErrMsg("Service Unavailable.");
+        toast.error(updateComment.data.message);
         return;
       }
       setBol(1);
       setCommentText("");
     } catch (error) {
-      setError(true);
-      setErrMsg(
-        "Service Unavailable."
-      );
+      // setError(true);
+      // setErrMsg("Service Unavailable.");
+      toast.error("Comment service unavailable, Please try after sometime.");
     }
   };
 
@@ -170,23 +209,24 @@ const TicketTables = () => {
     try {
       const comments = await Services.getRequestUsingParamId("/comment", id);
       if (!comments?.data.status) {
-        setError(true);
-        setErrMsg(
-          "Service Unavailable."
-        );
+        // setError(true);
+        // setErrMsg("Service Unavailable.");
+        toast.error(comments.data.message);
         return;
       }
+      console.log({ comments: comments.data.data });
+
       setBol(0);
-      setComments(
-        comments?.data?.data[0]
-          ? comments?.data?.data[0].comments
-          : comments.data.data
-      );
+      setComments(comments?.data?.data);
+      // setComments(
+      //   comments?.data?.data[0]
+      //     ? comments?.data?.data[0].comments
+      //     : comments.data.data
+      // );
     } catch (error) {
-      setError(true);
-        setErrMsg(
-          "Service Unavailable."
-        );
+      // setError(true);
+      // setErrMsg("Service Unavailable.");
+      toast.error("Comment service unavailable, Please try after sometime.");
     }
   };
 
@@ -196,15 +236,40 @@ const TicketTables = () => {
     } else {
       getComments(ticketId);
     }
+    // }, [comments.id, comments.username, comments.comment, commentText, bol]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [comments.id, comments.username, comments.comment, commentText, bol]);
+  }, [comments.comment, comments.username, comments._id, commentText, bol]);
+
+  const getFilterTickets = async (search: any) => {
+    try {
+      console.log("search", search);
+
+      const filterData = await Services.postRequest("/ticket/search", {
+        data: search,
+      });
+
+      if (!filterData?.data.status) {
+        toast.error(filterData.data.message);
+        return;
+      }
+      setFilteredTickets(filterData.data.data);
+    } catch (error) {
+      toast.error("Ticket service unavailable, Please try after sometime.");
+    }
+  };
 
   useEffect(() => {
-    const result = countries.filter((country: any) => {
-      return country.product.toLowerCase().match(search.toLowerCase());
-    });
-    setFilteredTickets(result);
-  }, [search, countries]);
+    // const result = tickets.filter((country: any) => {
+    //   return country.product.toLowerCase().match(search.toLowerCase());
+    // });
+
+    // const filterData = await postRequest(url: string, data: any);
+
+    // setFilteredTickets(result);
+    // console.log("search=>", search);
+
+    getFilterTickets(search);
+  }, [search]);
 
   const onStatusSelection = async (status: any, ticketId: any) => {
     try {
@@ -214,14 +279,16 @@ const TicketTables = () => {
         ticketId
       );
       if (!updatedTicket?.data.status) {
-        setError(true);
-        setErrMsg("Service Unavailable.");
+        // setError(true);
+        // setErrMsg("Service Unavailable.");
+        toast.error(updatedTicket.data.message);
         return;
       }
-      getTickets();
+      getTickets(pageCount);
     } catch (error) {
-      setError(true);
-      setErrMsg("Service Unavailable.");
+      // setError(true);
+      // setErrMsg("Service Unavailable.");
+      toast.error("Ticket service unavailable, Please try after sometime.");
     }
   };
 
@@ -233,14 +300,16 @@ const TicketTables = () => {
         ticketId
       );
       if (!updatedTicket?.data.status) {
-        setError(true);
-        setErrMsg("Service Unavailable.");
+        // setError(true);
+        // setErrMsg("Service Unavailable.");
+        toast.error(updatedTicket.data.message);
         return;
       }
-      getTickets();
+      getTickets(pageCount);
     } catch (error) {
-      setError(true);
-      setErrMsg("Service Unavailable.");
+      // setError(true);
+      // setErrMsg("Service Unavailable.");
+      toast.error("Ticket service unavailable, Please try after sometime.");
     }
   };
 
@@ -249,16 +318,20 @@ const TicketTables = () => {
       try {
         const users = await Services.getRequest("/user");
         if (!users?.data.status) {
-          setError(true);
-          setErrMsg(
-            "Currently, we are unable to get user details, Please try after sometime."
-          );
+          // setError(true);
+          // setErrMsg(
+          //   "Currently, we are unable to get user details, Please try after sometime."
+          // );
+          toast.error(users.data.message);
           return;
         }
         setUsers(users.data.data);
       } catch (error) {
-        setError(true);
-        setErrMsg(
+        // setError(true);
+        // setErrMsg(
+        //   "Currently, we are unable to get user details, Please try after sometime."
+        // );
+        toast.error(
           "Currently, we are unable to get user details, Please try after sometime."
         );
       }
@@ -273,16 +346,20 @@ const TicketTables = () => {
         ticketId
       );
       if (!removedTicket.data.status) {
-        setError(true);
-        setErrMsg(
-          "Currently, we are unable to remove ticket, Please try after sometime."
-        );
+        // setError(true);
+        // setErrMsg(
+        //   "Currently, we are unable to remove ticket, Please try after sometime."
+        // );
+        toast.error(removedTicket.data.message);
         return;
       }
-      getTickets();
+      getTickets(pageCount);
     } catch (error) {
-      setError(true);
-      setErrMsg(
+      // setError(true);
+      // setErrMsg(
+      //   "Currently, we are unable to remove ticket, Please try after sometime."
+      // );
+      toast.error(
         "Currently, we are unable to remove ticket, Please try after sometime."
       );
     }
@@ -296,12 +373,12 @@ const TicketTables = () => {
     {
       name: "Title",
       selector: (row: any) => row.ticket_name,
-      sortable: true,
+      // sortable: true,
     },
     {
       name: "Product",
       selector: (row: any) => row.product,
-      sortable: true,
+      // sortable: true,
     },
     {
       name: "Status",
@@ -323,13 +400,27 @@ const TicketTables = () => {
             <i
               className="bi bi-pencil-square"
               style={{
-                marginRight: "8px",
+                marginLeft: "-13px",
                 background: "#ffffff",
                 color: "black",
                 fontSize: "20px",
               }}
             ></i>
           </button>
+
+          <h5
+            style={{
+              cursor: "pointer",
+            }}
+            // onClick={() => removeTicket(row._id)}
+            onClick={() => {
+              setTogglePopup(true);
+              handleRowDetails(row);
+            }}
+          >
+            <DeleteOutlineIcon />
+          </h5>
+
           <div
             className="offcanvas offcanvas-end"
             tabIndex={-1}
@@ -438,7 +529,7 @@ const TicketTables = () => {
               {comments &&
                 comments.map((item: any) => {
                   return (
-                    <p key={item.id}>
+                    <p key={item._id}>
                       <strong style={{ paddingRight: "12px" }}>
                         {item.username}
                       </strong>
@@ -453,7 +544,7 @@ const TicketTables = () => {
                       {isEditMode ? (
                         userName === item.username &&
                         isEditMode &&
-                        item.id === commentId ? (
+                        item._id === commentId ? (
                           <div className="trash">
                             <input
                               type="text"
@@ -461,18 +552,18 @@ const TicketTables = () => {
                               onKeyDown={(e: any) => {
                                 handleEnter(
                                   e,
-                                  item.id,
+                                  item._id,
                                   item.username,
                                   e.target.value
                                 );
                               }}
                             />
-                            <Trash onClick={() => deleteCommet(item.id)} />
+                            <Trash onClick={() => deleteCommet(item._id)} />
                           </div>
                         ) : userName === item.username && isEditMode ? (
                           <div className="trash">
                             {item.comment}
-                            <Trash onClick={() => deleteCommet(item.id)} />
+                            <Trash onClick={() => deleteCommet(item._id)} />
                           </div>
                         ) : (
                           <div>{item.comment}</div>
@@ -483,11 +574,11 @@ const TicketTables = () => {
                           onDoubleClick={(e) => {
                             e.stopPropagation();
                             changeToEditMode();
-                            setCommentId(item.id);
+                            setCommentId(item._id);
                           }}
                         >
                           {item.comment}
-                          <Trash onClick={() => deleteCommet(item.id)} />
+                          <Trash onClick={() => deleteCommet(item._id)} />
                         </div>
                       ) : (
                         <div>{item.comment}</div>
@@ -500,40 +591,55 @@ const TicketTables = () => {
         </>
       ),
     },
-    {
-      name: "Remove",
-      cell: (row: any) => (
-        <h5
-          style={{ marginLeft: "12px", cursor: "pointer" }}
-          onClick={() => removeTicket(row._id)}
-        >
-          <DeleteOutlineIcon />
-        </h5>
-      ),
-    },
+    // {
+    //   name: "Remove",
+    //   cell: (row: any) => (
+    //     <h5
+    //       style={{ marginLeft: "12px", cursor: "pointer" }}
+    //       onClick={() => removeTicket(row._id)}
+    //     >
+    //       <DeleteOutlineIcon />
+    //     </h5>
+    //   ),
+    // },
   ];
 
-  const onCloseHandle = () => {
-    setError(false);
-  };
+  // const onCloseHandle = () => {
+  //   setError(false);
+  // };
 
   return (
     <>
-      {error ? (
+      <ToastContainer />
+
+      <AlertDialog
+        toggle={togglePopup}
+        message="Are you sure, you want to remove."
+        onClose={() => setTogglePopup(false)}
+        onClick={() => {
+          removeTicket(rowDetails._id);
+          setTogglePopup(false);
+        }}
+      />
+
+      {/* {error ? (
         <Error
           message={errMsg}
           onChange={() => {
             onCloseHandle();
           }}
         />
-      ) : null}
-      <div className="container mt-4">
-        <AddTicketModal onChange={() => getTickets()} />
+      ) : null} */}
+
+      <div className="container mt-0">
+        <header className="d-flex justify-content-between">
+          <h2 className="ticket-label">Tickets</h2>
+          <AddTicketModal onChange={() => getTickets(pageCount)} />
+        </header>
         <DataTable
           fixedHeader
           columns={columns}
           data={filteredTickets}
-          pagination
           fixedHeaderScrollHeight="420px"
           subHeader
           // ResponsiveWrapper
@@ -541,12 +647,18 @@ const TicketTables = () => {
           subHeaderComponent={
             <input
               type="text"
-              placeholder="Filter Tickets..."
-              className="w-25 form-control p-3 text-start search_bar"
+              placeholder="Filter by product..."
+              className="w-25 form-control p-2 text-start search_bar mt-3"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           }
+          progressPending={loading}
+          pagination
+          paginationServer
+          paginationTotalRows={totalRows}
+          onChangeRowsPerPage={handlePerRowsChange}
+          onChangePage={handlePageChange}
         />
       </div>
     </>

@@ -26,6 +26,14 @@ class Services {
   deleteRequestParamId(url: string, id: string) {
     return axios.delete(baseUrl + `${url}/${id}`);
   }
+
+  deleteRequestUsingTwoParamId(url: string, id1: string, id2: string) {
+    return axios.delete(baseUrl + `${url}/${id1}/${id2}`);
+  }
+
+  getPaginatedTickets(page: any, perPage: any) {
+    return axios.get(baseUrl + `/ticket?page=${page}&limit=${perPage}`);
+  }
 }
 
 // Below we are exporting the object of employee, so that we acan directly use object in component.

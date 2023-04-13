@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import "./CreateTicket.css";
 import services from "../../service/http";
-import Error from "../Error/Error";
+// import Error from "../Error/Error";
 import validation from "./validation";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CreateTicket = () => {
-
-  const [error, setError] = useState(false);
-  const [errMsg, setErrMsg] = useState("");
+//   const [error, setError] = useState(false);
+//   const [errMsg, setErrMsg] = useState("");
   const [formError, setFormError] = useState<any>({});
 
   const [ticket, setTicket] = useState({
@@ -35,8 +36,12 @@ const CreateTicket = () => {
         setFormError({});
         const data = await services.postRequest("/ticket", ticket);
         if (!data.data.status) {
+        //   setError(true);
+        //   setErrMsg("Unable to create ticket, Please try after sometime.");
+        toast.error(data.data.message);
           return;
         }
+        toast.success("Ticket Created Successfully.");
         setTicket({
           product: "",
           ticketname: "",
@@ -50,32 +55,44 @@ const CreateTicket = () => {
         setFormError(err);
       }
     } catch (error: any) {
-      setError(true);
-      setErrMsg("Unable to create ticket, Please try after sometime.");
+    //   setError(true);
+    //   setErrMsg("Unable to create ticket, Please try after sometime.");
+      toast.error("Unable to create ticket, Please try after sometime.");
     }
   };
 
-  const onCloseHandle = (value: any) => {
-    setError(value);
-  };
+//   const onCloseHandle = (value: any) => {
+//     setError(value);
+//   };
 
   return (
     <>
-      {error ? (
+    
+
+<ToastContainer />
+
+
+      {/* {error ? (
         <Error
           message={errMsg}
           onChange={(value: any) => {
             onCloseHandle(value);
           }}
         />
-      ) : null}
+      ) : null} */}
 
       <div className="create-ticket-form">
+        <h1 className="create-ticket-header">Create Ticket</h1>
+
+        <div className="form-group mb-3">
+          <label htmlFor="recipient-name" className="col-form-label">
+            Product:
+          </label>
         <select
           className="form-control col-md-1 mb-2"
           onChange={onCategorySelection}
         >
-          <option value="0"> --Select Product-- </option>
+          <option value="0"> --Select-- </option>
           <option value="BUG"> Website </option>
           <option value="MOBILE_APP"> Mobile App </option>
           <option value="SUBSCRIPTION"> Subscription </option>
@@ -83,10 +100,11 @@ const CreateTicket = () => {
           <option value="OTHER"> Other </option>
         </select>
         {formError.product && (
-            <small className="form-text text-danger mb-1">
-              {formError.product}
-            </small>
-          )}
+          <small className="form-text text-danger mb-1">
+            {formError.product}
+          </small>
+        )}
+        </div>
 
         <div className="form-group mb-3">
           <label htmlFor="recipient-name" className="col-form-label">
@@ -95,7 +113,7 @@ const CreateTicket = () => {
           <input
             type="text"
             name="ticketname"
-            className="form-control mt-0 p-3 text-start"
+            className="form-control mt-0 p-2 text-start"
             id="recipient-name"
             placeholder="Enter ticket title"
             value={ticket.ticketname}
@@ -137,22 +155,20 @@ const CreateTicket = () => {
           <input
             type="email"
             name="email"
-            className="form-control mt-0 p-3 text-start"
+            className="form-control mt-0 p-2 text-start"
             id="recipient-email"
             placeholder="Enter your email"
             value={ticket.email}
             onChange={ticketdetailsOnChange}
           />
           {formError.email && (
-            <small className="form-text text-danger">
-              {formError.email}
-            </small>
+            <small className="form-text text-danger">{formError.email}</small>
           )}
         </div>
 
         <button
           type="submit"
-          className="btn btn-primary custom-btn"
+          className="custom-btn"
           onClick={handleOnSubmit}
         >
           Create

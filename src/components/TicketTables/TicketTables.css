@@ -1,19 +1,11 @@
-/* .add_button {
-  margin-right: 1182px;
+.ticket-label {
+  /* margin-right: 1182px; */
+  margin-left: 8px;
   margin-top: 25px;
-  background: #ffc107;
+  /* background: #ffc107; */
   color: black;
   width: 7%;
 }
-
-.add_button:hover {
-  margin-right: 1182px;
-  margin-top: 25px;
-  background: #ffc107;
-  color: black;
-  width: 7%;
-} */
-
 
 .trash {
   display: flex;

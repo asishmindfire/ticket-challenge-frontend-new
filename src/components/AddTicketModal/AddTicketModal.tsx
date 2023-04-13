@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import Services from "../../service/http";
 import "./AddTicketModal.css";
-import Error from "../Error/Error";
+// import Error from "../Error/Error";
 import validation from "./validation";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function AddTicketModal(props: any) {
   const user: any = localStorage.getItem("user");
@@ -14,14 +16,13 @@ export default function AddTicketModal(props: any) {
     ticketdescription: "",
     created_by: logedInUser.user._id,
     assign_to: "",
-    status: "",
+    status: "BACKLOG",
     email: "",
   });
-  console.log({ ticketT: ticket });
 
   const [users, setUsers] = useState([]);
-  const [error, setError] = useState(false);
-  const [errMsg, setErrMsg] = useState("");
+  // const [error, setError] = useState(false);
+  // const [errMsg, setErrMsg] = useState("");
   const [formError, setFormError] = useState<any>({});
   const [isDismissModal, setIsDismissModal] = useState<boolean>(false);
 
@@ -31,18 +32,20 @@ export default function AddTicketModal(props: any) {
       try {
         const users = await Services.getRequest("/user");
         if (!users.data.status) {
-          setError(true);
-          setErrMsg(
-            "Currently, we are unable to create ticket, Please try after sometime."
-          );
+          // setError(true);
+          // setErrMsg(
+          //   "Currently, we are unable to create ticket, Please try after sometime."
+          // );
+          toast.error(users.data.message);
           return;
         }
         setUsers(users.data.data);
       } catch (error) {
-        setError(true);
-        setErrMsg(
-          "Currently, we are unable to fetch user details, Please try after sometime."
-        );
+        // setError(true);
+        // setErrMsg(
+        //   "Currently, we are unable to fetch user details, Please try after sometime."
+        // );
+        toast.error("Currently, we are unable to get user details, Please try after sometime...");
       }
     }
     fetchUser();
@@ -52,9 +55,9 @@ export default function AddTicketModal(props: any) {
     setTicket({ ...ticket, product: e.target.value });
   };
 
-  const onStatusSelection = (e: any) => {
-    setTicket({ ...ticket, status: e.target.value });
-  };
+  // const onStatusSelection = (e: any) => {
+  //   setTicket({ ...ticket, status: e.target.value });
+  // };
 
   const onUserSelection = (e: any) => {
     setTicket({ ...ticket, assign_to: e.target.value });
@@ -73,10 +76,11 @@ export default function AddTicketModal(props: any) {
         setFormError({});
         const data = await Services.postRequest("/ticket", ticket);
         if (!data.data.status) {
-          setError(true);
-          setErrMsg(
-            "Currently, we are unable to create ticket, Please try after sometime."
-          );
+          // setError(true);
+          // setErrMsg(
+          //   "Currently, we are unable to create ticket, Please try after sometime."
+          // );
+          toast.error(data.data.message);
           return;
         }
         setTicket({
@@ -85,7 +89,7 @@ export default function AddTicketModal(props: any) {
           ticketdescription: "",
           created_by: "",
           assign_to: "",
-          status: "",
+          status: "BACKLOG",
           email: "",
         });
         props.onChange();
@@ -94,27 +98,30 @@ export default function AddTicketModal(props: any) {
       }
       
     } catch (error) {
-      setError(true);
-      setErrMsg(
-        "Currently, we are unable to create ticket, Please try after sometime."
-      );
+      // setError(true);
+      // setErrMsg(
+      //   "Currently, we are unable to create ticket, Please try after sometime."
+      // );
+      toast.error("Currently, we are unable to create ticket, Please try after sometime.");
     }
   };
 
-  const onCloseHandle = () => {
-    setError(false);
-  };
+  // const onCloseHandle = () => {
+  //   setError(false);
+  // };
 
   return (
     <>
-      {error ? (
+      <ToastContainer />
+
+      {/* {error ? (
         <Error
           message={errMsg}
           onChange={(value: any) => {
             onCloseHandle();
           }}
         />
-      ) : null}
+      ) : null} */}
 
       {/* <!-- Button trigger modal --> */}
 
@@ -149,11 +156,16 @@ export default function AddTicketModal(props: any) {
               ></button>
             </div>
             <div className="modal-body">
+              
+            <div className="mb-3">
+                <label htmlFor="recipient-name" className="col-form-label">
+                Product:
+                </label>
               <select
                 className="form-control col-md-1"
                 onChange={onCategorySelection}
               >
-                <option value="0"> --Select Product-- </option>
+                <option value="0"> --Select-- </option>
                 <option value="BUG"> Website </option>
                 <option value="MOBILE_APP"> Mobile App </option>
                 <option value="SUBSCRIPTION"> Subscription </option>
@@ -165,15 +177,16 @@ export default function AddTicketModal(props: any) {
               {formError.product}
             </small>
           )}
+          </div>
 
               <div className="mb-3">
                 <label htmlFor="recipient-name" className="col-form-label">
-                  Ticket Title:
+                  Title:
                 </label>
                 <input
                   type="text"
                   name="ticketname"
-                  className="form-control text-start mt-0 pt-3 pb-4"
+                  className="form-control text-start mt-0 pt-2"
                   id="recipient-name"
                   placeholder="Enter ticket name"
                   value={ticket.ticketname}
@@ -187,7 +200,7 @@ export default function AddTicketModal(props: any) {
               </div>
               <div className="mb-3">
                 <label htmlFor="message-text" className="col-form-label">
-                  Ticket Description:
+                  Description:
                 </label>
                 <textarea
                   className="form-control"
@@ -224,7 +237,7 @@ export default function AddTicketModal(props: any) {
             </small>
           )}
 
-              <select
+              {/* <select
                 className="form-control col-md-1 mt-4"
                 onChange={onStatusSelection}
               >
@@ -237,7 +250,7 @@ export default function AddTicketModal(props: any) {
             <small className="form-text text-danger">
               {formError.status}
             </small>
-          )}
+          )} */}
               <div className="modal-footer">
                 <button
                   type="button"
