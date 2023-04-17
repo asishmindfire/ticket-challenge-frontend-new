@@ -40,8 +40,8 @@ const LoginForm = () => {
         const user = jwt(signinResp.data.data);
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("token", signinResp.data.data);
-        navigate("/dashboard");
-        // navigate("/dashboard", { state: { toggle: true }  });
+        // navigate("/dashboard");
+        navigate("/dashboard", { state: { toggle: true }  });
         // window.location.reload();
       } else {
         setFormError(err);
@@ -113,59 +113,48 @@ const LoginForm = () => {
         </div>
       </div> */}
 
-<div className="login-card">
-<div className="create-login-form">
-        <h1 className="create-ticket-header">Login</h1>
+      <div className="login-card">
+        <div className="create-login-form">
+          <h1 className="create-ticket-header">Login</h1>
 
-        
+          <div className="form-group mb-4">
+            <label htmlFor="recipient-name" className="col-form-label">
+              Email:
+            </label>
+            <input
+              className="form-control p-2 text-start"
+              type="email"
+              placeholder="Email"
+              name="email"
+              value={signin.email}
+              onChange={handleOnChange}
+            />
+            {formError.email && (
+              <small className="form-text text-danger">{formError.email}</small>
+            )}
+          </div>
 
-        <div className="form-group mb-4">
-          <label htmlFor="recipient-name" className="col-form-label">
-            Email:
-          </label>
-          <input
-            className="form-control p-2 text-start"
+          <div className="form-group mb-5">
+            <label htmlFor="email" className="col-form-label">
+              Password:
+            </label>
+            <input
+              className="form-control p-2 text-start"
+              type="password"
+              placeholder="Password"
+              name="password"
+              value={signin.password}
+              onChange={handleOnChange}
+            />
+            {formError.password && (
+              <small className=" text-danger">{formError.password}</small>
+            )}
+          </div>
 
-            type="email"
-            placeholder="Email"
-            name="email"
-            value={signin.email}
-            onChange={handleOnChange}
-          />
-          {formError.email && (
-            <small className="form-text text-danger">{formError.email}</small>
-          )}
+          <button type="submit" className="custom-btn" onClick={onSignIn}>
+            Create
+          </button>
         </div>
-
-        
-
-        <div className="form-group mb-5">
-          <label htmlFor="email" className="col-form-label">
-            Password:
-          </label>
-          <input
-            className="form-control p-2 text-start"
-
-            type="password"
-            placeholder="Password"
-            name="password"
-            value={signin.password}
-            onChange={handleOnChange}
-          />
-          {formError.password && (
-            <small className=" text-danger">{formError.password}</small>
-          )}
-
-        </div>
-
-        <button
-          type="submit"
-          className="custom-btn"
-        onClick={onSignIn}
-        >
-          Create
-        </button>
-      </div>
       </div>
     </>
   );

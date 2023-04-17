@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const baseUrl = "http://localhost:3000/api/v1";
+// const baseUrl = "http://localhost:3000/api/v1";
+const baseUrl = "https://ticket-management-system.onrender.com/api/v1";
 
 class Services {
   getRequest(url: string) {

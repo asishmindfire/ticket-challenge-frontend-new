@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import Services from "../../service/http";
 import "./AddTicketModal.css";
-// import Error from "../Error/Error";
 import validation from "./validation";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -21,10 +20,8 @@ export default function AddTicketModal(props: any) {
   });
 
   const [users, setUsers] = useState([]);
-  // const [error, setError] = useState(false);
-  // const [errMsg, setErrMsg] = useState("");
   const [formError, setFormError] = useState<any>({});
-  const [isDismissModal, setIsDismissModal] = useState<boolean>(false);
+  // const [isDismissModal, setIsDismissModal] = useState<boolean>(false);
 
 
   useEffect(() => {
@@ -32,19 +29,11 @@ export default function AddTicketModal(props: any) {
       try {
         const users = await Services.getRequest("/user");
         if (!users.data.status) {
-          // setError(true);
-          // setErrMsg(
-          //   "Currently, we are unable to create ticket, Please try after sometime."
-          // );
           toast.error(users.data.message);
           return;
         }
         setUsers(users.data.data);
       } catch (error) {
-        // setError(true);
-        // setErrMsg(
-        //   "Currently, we are unable to fetch user details, Please try after sometime."
-        // );
         toast.error("Currently, we are unable to get user details, Please try after sometime...");
       }
     }
@@ -54,10 +43,6 @@ export default function AddTicketModal(props: any) {
   const onCategorySelection = (e: any) => {
     setTicket({ ...ticket, product: e.target.value });
   };
-
-  // const onStatusSelection = (e: any) => {
-  //   setTicket({ ...ticket, status: e.target.value });
-  // };
 
   const onUserSelection = (e: any) => {
     setTicket({ ...ticket, assign_to: e.target.value });
@@ -71,15 +56,11 @@ export default function AddTicketModal(props: any) {
     try {
       const err = validation(ticket);
       if (Object.keys(err).length === 0) {
-        setIsDismissModal(true);
+        // setIsDismissModal(true);
         window.location.reload();
         setFormError({});
         const data = await Services.postRequest("/ticket", ticket);
         if (!data.data.status) {
-          // setError(true);
-          // setErrMsg(
-          //   "Currently, we are unable to create ticket, Please try after sometime."
-          // );
           toast.error(data.data.message);
           return;
         }
@@ -98,30 +79,13 @@ export default function AddTicketModal(props: any) {
       }
       
     } catch (error) {
-      // setError(true);
-      // setErrMsg(
-      //   "Currently, we are unable to create ticket, Please try after sometime."
-      // );
       toast.error("Currently, we are unable to create ticket, Please try after sometime.");
     }
   };
 
-  // const onCloseHandle = () => {
-  //   setError(false);
-  // };
-
   return (
     <>
       <ToastContainer />
-
-      {/* {error ? (
-        <Error
-          message={errMsg}
-          onChange={(value: any) => {
-            onCloseHandle();
-          }}
-        />
-      ) : null} */}
 
       {/* <!-- Button trigger modal --> */}
 
@@ -261,7 +225,8 @@ export default function AddTicketModal(props: any) {
                 </button>
                 <button
                   type="button"
-                  data-bs-dismiss={isDismissModal ? "modal" : null}
+                  // data-bs-dismiss={isDismissModal ? "modal" : null}
+                  // data-bs-dismiss="modal"
                   className="btn btn-primary"
                   onClick={handleOnSubmit}
                 >

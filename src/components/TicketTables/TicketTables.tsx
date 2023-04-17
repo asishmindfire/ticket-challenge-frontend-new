@@ -17,9 +17,8 @@ const TicketTables = () => {
   const logedInUser = JSON.parse(user);
   const userName = logedInUser.user.user_name;
   const [search, setSearch] = useState("");
-  // const search = useRef<any>("");
 
-  // const [countries, setCountries] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [tickets, setTickets] = useState<any>([]);
   const [filteredTickets, setFilteredTickets] = useState([]);
 
