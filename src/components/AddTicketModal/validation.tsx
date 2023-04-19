@@ -17,10 +17,6 @@ const validation = (values: any) => {
     error.assign_to = "Please select assignee";
   }
 
-  if (!values.status) {
-    error.status = "Please select Status.";
-  }
-
   return error;
 };
 

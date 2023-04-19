@@ -14,26 +14,22 @@ const HomeNavbar = () => {
               id="navbar_ul"
             >
               <li className="ms-2 me-5">
-                 <h2 className="brand-logo">TMS</h2>
+                <h2 className="brand-logo">TMS</h2>
               </li>
 
+              <div className="d-flex">
+                <li className="ms-2 me-5">
+                  <Link to="/" className="nav-link px-3" id="navbar_link">
+                    Create
+                  </Link>
+                </li>
 
-    <div className="d-flex">
-              <li className="ms-2 me-5">
-                <Link to="/" className="nav-link px-3" id="navbar_link">
-                  Create
-                </Link>
-              </li>
-
-              <li className="ms-2 me-2">
-                <Link to="/login" className="nav-link px-3" id="navbar_link">
-                  Manage
-                </Link>
-              </li>
-
+                <li className="ms-2 me-2">
+                  <Link to="/login" className="nav-link px-3" id="navbar_link">
+                    Manage
+                  </Link>
+                </li>
               </div>
-
-
             </ul>
           </div>
         </div>

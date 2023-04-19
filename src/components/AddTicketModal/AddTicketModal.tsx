@@ -2,27 +2,15 @@ import { useState, useEffect } from "react";
 import Services from "../../service/http";
 import "./AddTicketModal.css";
 import validation from "./validation";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useForm } from "../CustomHooks/useForm";
 
 export default function AddTicketModal(props: any) {
   const user: any = localStorage.getItem("user");
   const logedInUser = JSON.parse(user);
 
-  const [ticket, setTicket] = useState({
-    product: "",
-    ticketname: "",
-    ticketdescription: "",
-    created_by: logedInUser.user._id,
-    assign_to: "",
-    status: "BACKLOG",
-    email: "",
-  });
-
   const [users, setUsers] = useState([]);
-  const [formError, setFormError] = useState<any>({});
-  // const [isDismissModal, setIsDismissModal] = useState<boolean>(false);
-
 
   useEffect(() => {
     async function fetchUser() {
@@ -34,54 +22,42 @@ export default function AddTicketModal(props: any) {
         }
         setUsers(users.data.data);
       } catch (error) {
-        toast.error("Currently, we are unable to get user details, Please try after sometime...");
+        toast.error(
+          "Currently, we are unable to get user details, Please try after sometime..."
+        );
       }
     }
     fetchUser();
   }, []);
 
-  const onCategorySelection = (e: any) => {
-    setTicket({ ...ticket, product: e.target.value });
-  };
-
-  const onUserSelection = (e: any) => {
-    setTicket({ ...ticket, assign_to: e.target.value });
-  };
-
-  const ticketdetailsOnChange = (e: any) => {
-    setTicket({ ...ticket, [e.target.name]: e.target.value });
-  };
-
-  const handleOnSubmit = async () => {
+  const addTicketForm = async () => {
     try {
-      const err = validation(ticket);
-      if (Object.keys(err).length === 0) {
-        // setIsDismissModal(true);
-        window.location.reload();
-        setFormError({});
-        const data = await Services.postRequest("/ticket", ticket);
-        if (!data.data.status) {
-          toast.error(data.data.message);
-          return;
-        }
-        setTicket({
-          product: "",
-          ticketname: "",
-          ticketdescription: "",
-          created_by: "",
-          assign_to: "",
-          status: "BACKLOG",
-          email: "",
-        });
-        props.onChange();
-      } else {
-        setFormError(err);
+      window.location.reload();
+      const data = await Services.postRequest("/ticket", values);
+      if (!data.data.status) {
+        toast.error(data.data.message);
+        return;
       }
-      
     } catch (error) {
-      toast.error("Currently, we are unable to create ticket, Please try after sometime.");
+      toast.error(
+        "Currently, we are unable to create ticket, Please try after sometime."
+      );
     }
   };
+
+  const { values, errors, handleChange, handleSubmit } = useForm(
+    addTicketForm,
+    {
+      product: "",
+      ticketname: "",
+      ticketdescription: "",
+      created_by: logedInUser.user._id,
+      assign_to: "",
+      status: "BACKLOG",
+      email: "",
+    },
+    validation
+  );
 
   return (
     <>
@@ -120,28 +96,29 @@ export default function AddTicketModal(props: any) {
               ></button>
             </div>
             <div className="modal-body">
-              
-            <div className="mb-3">
+              <div className="mb-3">
                 <label htmlFor="recipient-name" className="col-form-label">
-                Product:
+                  Product:
                 </label>
-              <select
-                className="form-control col-md-1"
-                onChange={onCategorySelection}
-              >
-                <option value="0"> --Select-- </option>
-                <option value="BUG"> Website </option>
-                <option value="MOBILE_APP"> Mobile App </option>
-                <option value="SUBSCRIPTION"> Subscription </option>
-                <option value="GENERAL"> General </option>
-                <option value="OTHER"> Other </option>
-              </select>
-              {formError.product && (
-            <small className="form-text text-danger">
-              {formError.product}
-            </small>
-          )}
-          </div>
+                <select
+                  className="form-control col-md-1"
+                  name="product"
+                  value={values.product}
+                  onChange={handleChange}
+                >
+                  <option value="0"> --Select-- </option>
+                  <option value="WEBSITE"> Website </option>
+                  <option value="MOBILE_APP"> Mobile App </option>
+                  <option value="SUBSCRIPTION"> Subscription </option>
+                  <option value="GENERAL"> General </option>
+                  <option value="OTHER"> Other </option>
+                </select>
+                {errors.product && (
+                  <small className="form-text text-danger">
+                    {errors.product}
+                  </small>
+                )}
+              </div>
 
               <div className="mb-3">
                 <label htmlFor="recipient-name" className="col-form-label">
@@ -153,14 +130,14 @@ export default function AddTicketModal(props: any) {
                   className="form-control text-start mt-0 pt-2"
                   id="recipient-name"
                   placeholder="Enter ticket name"
-                  value={ticket.ticketname}
-                  onChange={ticketdetailsOnChange}
+                  value={values.ticketname}
+                  onChange={handleChange}
                 />
-                 {formError.ticketname && (
-            <small className="form-text text-danger">
-              {formError.ticketname}
-            </small>
-          )}
+                {errors.ticketname && (
+                  <small className="form-text text-danger">
+                    {errors.ticketname}
+                  </small>
+                )}
               </div>
               <div className="mb-3">
                 <label htmlFor="message-text" className="col-form-label">
@@ -171,19 +148,22 @@ export default function AddTicketModal(props: any) {
                   name="ticketdescription"
                   id="message-text1"
                   placeholder="Enter ticket description"
-                  value={ticket.ticketdescription}
-                  onChange={ticketdetailsOnChange}
+                  value={values.ticketdescription}
+                  onChange={handleChange}
                 ></textarea>
-                
-              {formError.ticketdescription && (
-            <small className="form-text text-danger">
-              {formError.ticketdescription}
-            </small>
-          )}
+
+                {errors.ticketdescription && (
+                  <small className="form-text text-danger">
+                    {errors.ticketdescription}
+                  </small>
+                )}
               </div>
+
               <select
                 className="form-control col-md-1"
-                onChange={onUserSelection}
+                name="assign_to"
+                value={values.assign_to}
+                onChange={handleChange}
               >
                 <option value="0"> --Assign To-- </option>
                 {users?.map((el: any) => {
@@ -195,26 +175,12 @@ export default function AddTicketModal(props: any) {
                 })}
               </select>
 
-              {formError.assign_to && (
-            <small className="form-text text-danger">
-              {formError.assign_to}
-            </small>
-          )}
+              {errors.assign_to && (
+                <small className="form-text text-danger">
+                  {errors.assign_to}
+                </small>
+              )}
 
-              {/* <select
-                className="form-control col-md-1 mt-4"
-                onChange={onStatusSelection}
-              >
-                <option value="0"> --Status-- </option>
-                <option value="BACKLOG"> Backlog </option>
-                <option value="INPROGRESS"> Inprogress </option>
-                <option value="DONE"> Done </option>
-              </select>
-              {formError.status && (
-            <small className="form-text text-danger">
-              {formError.status}
-            </small>
-          )} */}
               <div className="modal-footer">
                 <button
                   type="button"
@@ -223,12 +189,12 @@ export default function AddTicketModal(props: any) {
                 >
                   Close
                 </button>
+
                 <button
-                  type="button"
-                  // data-bs-dismiss={isDismissModal ? "modal" : null}
+                  type="submit"
                   // data-bs-dismiss="modal"
                   className="btn btn-primary"
-                  onClick={handleOnSubmit}
+                  onClick={handleSubmit}
                 >
                   Submit
                 </button>

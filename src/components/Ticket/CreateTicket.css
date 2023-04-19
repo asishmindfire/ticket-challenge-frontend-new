@@ -18,11 +18,11 @@
   background-color: rgb(32, 177, 255);
   border: none;
   color: black;
-  transition: all .5s;
+  transition: all 0.5s;
 }
 
 .custom-btn:hover {
-    transform: scale(1.1);
+  transform: scale(1.1);
 }
 
 .create-ticket-header {
@@ -32,41 +32,12 @@
   margin-bottom: 25px;
 }
 
-/* 
-@media (max-width: 1200px) {
-    .create-ticket-form {
-        width: 40%;
-    }
+/* input:invalid:not(:placeholder-shown) {
+  border: 2px solid red !important;
 }
 
-@media (max-width: 1000px) {
-    .create-ticket-form {
-        width: 45%;
-    }
-}
-
-@media (max-width: 800px) {
-    .create-ticket-form {
-        width: 50%;
-    }
-}
-
-@media (max-width: 700px) {
-    .create-ticket-form {
-        width: 55%;
-    }
-}
-
-@media (max-width: 600px) {
-    .create-ticket-form {
-        width: 60%;
-    }
-}
-
-@media (max-width: 500px) {
-    .create-ticket-form {
-        width: 80%;
-    }
+input:valid:not(:placeholder-shown) {
+  border: 2px solid green;
 } */
 
 @media (max-width: 500px) {
