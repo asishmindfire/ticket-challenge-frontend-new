@@ -15,6 +15,7 @@ const TicketTables = () => {
   const user: any = localStorage.getItem("user");
   const logedInUser = JSON.parse(user);
   const userName = logedInUser.user.user_name;
+  const userId = logedInUser.user._id;
   const [search, setSearch] = useState("");
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -29,7 +30,7 @@ const TicketTables = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [ticketId, setTicketId] = useState("");
   const [check, setCheck] = useState(true);
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<any>([]);
   const [ticketAssignedUser, setTicketAssignedUser] = useState<any>({});
   const [togglePopup, setTogglePopup] = useState(false);
 
@@ -141,10 +142,9 @@ const TicketTables = () => {
 
   const handleOnClick = async () => {
     try {
-
       const updateComment = await Services.postRequest("/comment", {
         ticketId: rowDetails._id,
-        username: userName,
+        userId: userId,
         comment: commentText,
       });
       if (!updateComment?.data.status) {
@@ -167,7 +167,16 @@ const TicketTables = () => {
       }
 
       setBol(0);
-      setComments(comments?.data?.data);
+      let tempComments = comments?.data?.data;
+      for (const c in tempComments) {
+        for (const u in users) {
+          if (tempComments[c].userId === users[u]._id) {
+            tempComments[c]["username"] = users[u].user_name;
+          }
+        }
+      }
+
+      setComments(tempComments);
     } catch (error) {
       toast.error("Comment service unavailable, Please try after sometime.");
     }

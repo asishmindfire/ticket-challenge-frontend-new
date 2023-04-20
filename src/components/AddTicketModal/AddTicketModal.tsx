@@ -32,12 +32,12 @@ export default function AddTicketModal(props: any) {
 
   const addTicketForm = async () => {
     try {
-      window.location.reload();
       const data = await Services.postRequest("/ticket", values);
       if (!data.data.status) {
         toast.error(data.data.message);
         return;
       }
+      window.location.reload();
     } catch (error) {
       toast.error(
         "Currently, we are unable to create ticket, Please try after sometime."
